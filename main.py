@@ -93,33 +93,18 @@ def loadPackageCSV(filename):
 
             package = Package(pID, pAddr, pZipCode, pWeight, pDeadLine, pCity, pStatus)
 
-            #print(package)
-
             myHash.insert(pID, package)
 
-            #print(myHash.table)
+city_arr2 = []
+weight_arr2 = []
 
 def loadDistanceTableCSV(filename):
     with open(filename) as DistanceTableCSV:
         distanceTableData = csv.reader(DistanceTableCSV, delimiter=',')
         next(distanceTableData)
         for distance in distanceTableData:
-            print(distance)
-            '''pID = int(package[0])
-            pAddr = package[1]
-            pCity = package[2]
-            pZipCode = package[3]
-            pDeadLine = package[4]
-            pWeight = package[5]
-            pStatus = "The Hub"'''
-
-            #package = Package(pID, pAddr, pZipCode, pWeight, pDeadLine, pCity, pStatus)
-
-            #print(package)
-
-            #myHash.insert(pID, package)
-
-            #print(myHash.table)
+            city_arr2.append(distance[0])
+            weight_arr2.append(distance[2:len(distance)])
 
 def packageLookUp(ID):
     return myHash.search(ID)
@@ -172,18 +157,6 @@ def get_shortest_path(start_vertex, end_vertex):
     path = start_vertex.label + path
     return path
 
-
-def get_shortest_path_city(start_vertex, end_vertex):
-    # Start from end_vertex and build the path backwards.
-    path = ""
-    current_vertex = end_vertex
-    while current_vertex is not start_vertex:
-        myMovie = myHash.search(int(current_vertex.label))
-        path = " -> " + myMovie.city + path
-        current_vertex = current_vertex.pred_vertex
-    path = "Salt Lake City " + path
-    return path
-
 myHash = ChainingHashTable()
 
 loadPackageCSV("PackageCSV.csv")
@@ -192,55 +165,24 @@ loadDistanceTableCSV("DistanceTableCSV.csv")
 
 g = Graph()
 
-'''weight_arr = [
-    [7.2],
-    [3.8, 7.1]
-]
+vertex_arr = []
 
-city_arr = ["Western Governors University 4001 South 700 East, Salt Lake City, UT 84107",
-            " 1060 Dalton Ave S (84104)",
-            "1330 2100 S (84106)"] '''
+for i in range(0, len(city_arr2)):
+    vertex_arr.append(Vertex(city_arr2[i].replace('\n', ' ')))
+    g.add_vertex(vertex_arr[i])
 
-vertex_1 = Vertex("Western Governors University"
-"4001 South 700 East," 
-"Salt Lake City, UT 84107")
-g.add_vertex(vertex_1)
+for i in range(0, len(vertex_arr)):
+    for j in range(i + 1, len(vertex_arr)):
+        g.add_undirected_edge(vertex_arr[i], vertex_arr[j], float(weight_arr2[j][i]))
 
-vertex_2 = Vertex(" 1060 Dalton Ave S"
-"(84104)")
-g.add_vertex(vertex_2)
+dijkstra_shortest_path(g, vertex_arr[0])
 
-vertex_3 = Vertex("1330 2100 S"
-"(84106)")
-g.add_vertex(vertex_3)
-
-g.add_undirected_edge(vertex_1, vertex_2, 7.2)
-g.add_undirected_edge(vertex_1, vertex_3, 3.8)
-g.add_undirected_edge(vertex_2, vertex_3, 7.1)
-
-dijkstra_shortest_path(g, vertex_1)
-
-'''print("\nDijkstra shortest path:")
+print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
-    if v.pred_vertex is None and v is not vertex_1:
+    if v.pred_vertex is None and v is not vertex_arr[0]:
         print("1 to %s ==> no path exists" % v.label)
     else:
-        print("1 to %s ==> %s (total distance: %g)" % (v.label, get_shortest_path(vertex_1, v), v.distance))
-'''
-#print(vertex_1.label, vertex_2.label)
-
-#print(g.edge_weights)
-
-#print(packageLookUp(3))
+        print("1 to %s ==> %s (total distance: %g)" % (v.label, get_shortest_path(vertex_arr[0], v), v.distance))
 
 #for i in range(len(myHash.table)+1):
  #  print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
-
-#myHash.insert(1)
-#myHash.insert(1)
-
-#1d to access the bucket, 2d to access a key value pair in the bucket, and 3d to access the specific itm in the key value
-# pair, in the below case, the object itself
-
-#kv = myHash.table[1][1][1]
-#print(kv)
