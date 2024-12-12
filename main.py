@@ -167,22 +167,38 @@ g = Graph()
 
 vertex_arr = []
 
+#adding all vertices to graph
 for i in range(0, len(city_arr2)):
     vertex_arr.append(Vertex(city_arr2[i].replace('\n', ' ')))
     g.add_vertex(vertex_arr[i])
 
+#adding undirected edge between two vertices
 for i in range(0, len(vertex_arr)):
     for j in range(i + 1, len(vertex_arr)):
         g.add_undirected_edge(vertex_arr[i], vertex_arr[j], float(weight_arr2[j][i]))
 
-dijkstra_shortest_path(g, vertex_arr[0])
+vertex_1 = vertex_arr[0]
 
-print("\nDijkstra shortest path:")
+dijkstra_shortest_path(g, vertex_1)
+
+#print(city_arr2[0].replace('\n', ' '),"->", city_arr2[1].replace('\n', ' '), "is", weight_arr2[1][0])
+#print(city_arr2[0].replace('\n', ' '),"->", city_arr2[2].replace('\n', ' '), "is", weight_arr2[2][0])
+#print(city_arr2[1].replace('\n', ' '),"->", city_arr2[2].replace('\n', ' '), "is", weight_arr2[2][1])
+
+def getDistanceBetween2Cities(start, end):
+    if(start <= end):
+        return weight_arr2[end][start]
+    else:
+        return 'ERROR::make sure start is less than or equal to end'
+
+print(getDistanceBetween2Cities(0, 3))
+
+'''print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
-    if v.pred_vertex is None and v is not vertex_arr[0]:
+    if v.pred_vertex is None and v is not vertex_1:
         print("1 to %s ==> no path exists" % v.label)
     else:
-        print("1 to %s ==> %s (total distance: %g)" % (v.label, get_shortest_path(vertex_arr[0], v), v.distance))
+        print("1 to %s ==> %s (total distance: %g)" % (v.label, get_shortest_path(vertex_1, v), v.distance))'''
 
 #for i in range(len(myHash.table)+1):
  #  print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
