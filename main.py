@@ -146,7 +146,6 @@ def dijkstra_shortest_path(g, start_vertex):
                 adj_vertex.distance = alternative_path_distance
                 adj_vertex.pred_vertex = current_vertex
 
-
 def get_shortest_path(start_vertex, end_vertex):
     # Start from end_vertex and build the path backwards.
     path = ""
@@ -177,13 +176,9 @@ for i in range(0, len(vertex_arr)):
     for j in range(i + 1, len(vertex_arr)):
         g.add_undirected_edge(vertex_arr[i], vertex_arr[j], float(weight_arr2[j][i]))
 
-vertex_1 = vertex_arr[0]
+#vertex_1 = vertex_arr[1]
 
-dijkstra_shortest_path(g, vertex_1)
-
-#print(city_arr2[0].replace('\n', ' '),"->", city_arr2[1].replace('\n', ' '), "is", weight_arr2[1][0])
-#print(city_arr2[0].replace('\n', ' '),"->", city_arr2[2].replace('\n', ' '), "is", weight_arr2[2][0])
-#print(city_arr2[1].replace('\n', ' '),"->", city_arr2[2].replace('\n', ' '), "is", weight_arr2[2][1])
+#dijkstra_shortest_path(g, vertex_1)
 
 def getDistanceBetween2Cities(start, end):
     if(start <= end):
@@ -191,7 +186,20 @@ def getDistanceBetween2Cities(start, end):
     else:
         return 'ERROR::make sure start is less than or equal to end'
 
-print(getDistanceBetween2Cities(0, 3))
+def getMinimumDistanceBetween2Cities(start, end):
+    vertex_1 = vertex_arr[start]
+    dijkstra_shortest_path(g, vertex_1)
+    get_shortest_path(vertex_arr[start], vertex_arr[end])
+    if(start <= end):
+        return vertex_arr[end].distance
+    else:
+        return 'ERROR::make sure start is less than or equal to end'
+
+#print(getDistanceBetween2Cities(0, 14))
+print(getMinimumDistanceBetween2Cities(0, 5))
+print(getMinimumDistanceBetween2Cities(5, 9))
+
+#print("1 to %s ==> %s (total distance: %g)" % (vertex_arr[1].label, get_shortest_path(vertex_1, vertex_arr[1]), vertex_arr[1].distance))
 
 '''print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
@@ -200,5 +208,5 @@ for v in g.adjacency_list:
     else:
         print("1 to %s ==> %s (total distance: %g)" % (v.label, get_shortest_path(vertex_1, v), v.distance))'''
 
-#for i in range(len(myHash.table)+1):
- #  print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
+for i in range(len(myHash.table)+1):
+    print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
