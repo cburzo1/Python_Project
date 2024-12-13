@@ -78,6 +78,12 @@ class Graph:
         self.add_directed_edge(vertex_a, vertex_b, weight)
         self.add_directed_edge(vertex_b, vertex_a, weight)
 
+class truck:
+    def __init__(self, num, packageList, location):
+        self.num = num
+        self.packageList = packageList
+        self.location = location
+
 def loadPackageCSV(filename):
     with open(filename) as PackageCSV:
         packageData = csv.reader(PackageCSV, delimiter=',')
@@ -86,12 +92,12 @@ def loadPackageCSV(filename):
             pID = int(package[0])
             pAddr = package[1]
             pCity = package[2]
-            pZipCode = package[3]
-            pDeadLine = package[4]
-            pWeight = package[5]
-            pStatus = "The Hub"
+            pZipCode = package[4]
+            pDeadLine = package[5]
+            pWeight = package[6]
+            pStatus = "At Hub"
 
-            package = Package(pID, pAddr, pZipCode, pWeight, pDeadLine, pCity, pStatus)
+            package = Package(pID, pAddr, pCity,  pZipCode, pDeadLine, pWeight,  pStatus)
 
             myHash.insert(pID, package)
 
@@ -103,7 +109,8 @@ def loadDistanceTableCSV(filename):
         distanceTableData = csv.reader(DistanceTableCSV, delimiter=',')
         next(distanceTableData)
         for distance in distanceTableData:
-            city_arr2.append(distance[0])
+            #print(distance[1])
+            city_arr2.append(distance[1])
             weight_arr2.append(distance[2:len(distance)])
 
 def packageLookUp(ID):
@@ -187,17 +194,56 @@ def getDistanceBetween2Cities(start, end):
         return 'ERROR::make sure start is less than or equal to end'
 
 def getMinimumDistanceBetween2Cities(start, end):
+    #print("Start", start)
+    #print("End", end)
     vertex_1 = vertex_arr[start]
     dijkstra_shortest_path(g, vertex_1)
     get_shortest_path(vertex_arr[start], vertex_arr[end])
+
     if(start <= end):
         return vertex_arr[end].distance
     else:
         return 'ERROR::make sure start is less than or equal to end'
 
+'''trk = truck(1, [1,2, 3, 4, 5], "At Hub")
+
+arr = [1, 2, 3, 4]
+
+pkS1 = 0
+pkE1 = city_arr2.index(" "+packageLookUp(arr[0]).addr+"\n("+packageLookUp(arr[0]).zipcode+")")
+
+pkS2 = city_arr2.index(" "+packageLookUp(arr[0]).addr+"\n("+packageLookUp(arr[0]).zipcode+")")
+pkE2 = city_arr2.index(" "+packageLookUp(arr[1]).addr+"\n("+packageLookUp(arr[1]).zipcode+")")
+
+pkS3 = city_arr2.index(" "+packageLookUp(arr[1]).addr+"\n("+packageLookUp(arr[1]).zipcode+")")
+pkE3 = city_arr2.index(" "+packageLookUp(arr[2]).addr+"\n("+packageLookUp(arr[2]).zipcode+")")'''
+
+'''for i in range(0, len(trk.packageList)):
+    if trk.location == "At Hub":
+        pkS = 0
+        pkE = city_arr2.index(" "+packageLookUp(trk.packageList[i]).addr+"\n("+packageLookUp(trk.packageList[i]).zipcode+")")
+        trk.location = "Delivered"
+    else:
+        pkS = city_arr2.index(" " + packageLookUp(trk.packageList[i - 1]).addr + "\n(" + packageLookUp(trk.packageList[i - 1]).zipcode + ")")
+        pkE = city_arr2.index(" " + packageLookUp(trk.packageList[i]).addr + "\n(" + packageLookUp(trk.packageList[i]).zipcode + ")")
+
+    if pkS < pkE:
+        print(getMinimumDistanceBetween2Cities(pkS, pkE))
+    else:
+        print(getMinimumDistanceBetween2Cities(pkE, pkS))'''
+
 #print(getDistanceBetween2Cities(0, 14))
-print(getMinimumDistanceBetween2Cities(0, 5))
-print(getMinimumDistanceBetween2Cities(5, 9))
+#print(getMinimumDistanceBetween2Cities(pkS1, pkE1))
+#print(getMinimumDistanceBetween2Cities(pkS2, pkE2))
+
+#print(getMinimumDistanceBetween2Cities(pkS1, pkE1))
+#print(getMinimumDistanceBetween2Cities(pkS2, pkE2))
+#print(getMinimumDistanceBetween2Cities(pkE3, pkS3))
+
+#print(" "+packageLookUp(1).addr+"\n("+packageLookUp(1).zipcode+")")
+
+#print(city_arr2.index(" "+packageLookUp(2).addr+"\n("+packageLookUp(2).zipcode+")"))
+#print(getMinimumDistanceBetween2Cities(5, 9))
 
 #print("1 to %s ==> %s (total distance: %g)" % (vertex_arr[1].label, get_shortest_path(vertex_1, vertex_arr[1]), vertex_arr[1].distance))
 
@@ -208,5 +254,5 @@ for v in g.adjacency_list:
     else:
         print("1 to %s ==> %s (total distance: %g)" % (v.label, get_shortest_path(vertex_1, v), v.distance))'''
 
-for i in range(len(myHash.table)+1):
-    print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
+#for i in range(len(myHash.table)+1):
+    #print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
