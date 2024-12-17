@@ -222,49 +222,69 @@ def getTimeBetweenPXandPY(time_string, distanceFromPXtoPy):
     # print(travel_time, (current_time + travel_time))
     return current_time + travel_time
 
-trk = truck(1, [1,2,4, 5, 7, 8,10, 11, 12], "At Hub", "08:00:00")
-total = 0
-currentTime = trk.time
-pkS = 0
-pkE = 0
+def getTruckRoute(trk):
+    total = 0
+    currentTime = trk.time
+    pkS = 0
+    pkE = 0
 
-for i in range(0, len(trk.packageList)):
-    if trk.location == "At Hub":
-        pkS = city_arr2.index(" HUB")
-        pkE = city_arr2.index(" "+packageLookUp(trk.packageList[i]).addr+"\n("+packageLookUp(trk.packageList[i]).zipcode+")")
-        trk.location = "Delivered"
-    else:
-        pkS = city_arr2.index(" " + packageLookUp(trk.packageList[i - 1]).addr + "\n(" + packageLookUp(trk.packageList[i - 1]).zipcode + ")")
-        pkE = city_arr2.index(" " + packageLookUp(trk.packageList[i]).addr + "\n(" + packageLookUp(trk.packageList[i]).zipcode + ")")
-        trk.location = "Delivered"
+    arrList = []
 
-    if pkS < pkE:
-        temp_var = getMinimumDistanceBetween2Cities(pkS, pkE)
-        print(round(temp_var, 1))
-        currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
-        print(currentTime, trk.location)
-        total += temp_var
-        #print("Not Switched")
+    for i in range(0, len(trk.packageList)):
+        if trk.location == "At Hub":
+            pkS = city_arr2.index(" HUB")
+            pkE = city_arr2.index(" "+packageLookUp(trk.packageList[i]).addr+"\n("+packageLookUp(trk.packageList[i]).zipcode+")")
+            trk.location = "Delivered"
+        else:
+            pkS = city_arr2.index(" " + packageLookUp(trk.packageList[i - 1]).addr + "\n(" + packageLookUp(trk.packageList[i - 1]).zipcode + ")")
+            pkE = city_arr2.index(" " + packageLookUp(trk.packageList[i]).addr + "\n(" + packageLookUp(trk.packageList[i]).zipcode + ")")
+            trk.location = "Delivered"
 
-    else:
-        temp_var = getMinimumDistanceBetween2Cities(pkE, pkS)
-        print(round(temp_var, 1))
-        currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
-        print(currentTime, trk.location)
-        total += temp_var
-        #print("Switched")
+        if pkS < pkE:
+            temp_var = getMinimumDistanceBetween2Cities(pkS, pkE)
+            print(round(temp_var, 1))
+            currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+            print(currentTime, trk.location)
+            total += temp_var
+            arrList.append({"truck":trk.num, "packageID":trk.packageList[i], "distanceTraveled": total,"status":trk.location, "time":str(currentTime)})
+            #print("Not Switched")
 
-    if i == len(trk.packageList) - 1:
-        temp_var = getMinimumDistanceBetween2Cities(city_arr2.index(" HUB"), pkS)
-        print(temp_var)
-        currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
-        trk.location = "At Hub"
-        print(currentTime, trk.location)
-        total += temp_var
+        else:
+            temp_var = getMinimumDistanceBetween2Cities(pkE, pkS)
+            print(round(temp_var, 1))
+            currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+            print(currentTime, trk.location)
+            total += temp_var
+            arrList.append({"truck": trk.num, "packageID": trk.packageList[i], "distanceTraveled": total,"status": trk.location, "time": str(currentTime)})
+            #print("Switched")
 
-print("--------------------------------------------------------------------------------")
-print("Total Distance of Truck1 and total time of travel:", round(total, 1), currentTime)
+        if i == len(trk.packageList) - 1 and pkS < pkE:
+            temp_var = getMinimumDistanceBetween2Cities(city_arr2.index(" HUB"), pkE)
+            print(temp_var)
+            currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+            trk.location = "At Hub"
+            print(currentTime, trk.location)
+            total += temp_var
+            arrList.append({"truck": trk.num, "packageID": trk.packageList[i], "distanceTraveled": total, "status": trk.location, "time": str(currentTime)})
+        elif i == len(trk.packageList) - 1 and pkS > pkE:
+            temp_var = getMinimumDistanceBetween2Cities(city_arr2.index(" HUB"), pkS)
+            print(temp_var)
+            currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+            trk.location = "At Hub"
+            print(currentTime, trk.location)
+            total += temp_var
+            arrList.append({"truck": trk.num, "packageID": trk.packageList[i], "distanceTraveled": total, "status": trk.location, "time": str(currentTime)})
 
+    return arrList
+
+arr1 = getTruckRoute(truck(1, [1, 2], "At Hub", "08:00:00"))
+arr2 = getTruckRoute(truck(2, [3, 5], "At Hub", "08:00:00"))
+# use the top for loop to build a list of the trucks and the status and the time (essentially
+# everything you are missing from pacakgeData). THEN build a loop to look for a package by time
+# compare the time input by every time value in the arrList array, if the time is not found
+# then you could still display the package with the truck En Route
+arrMaster = arr1 + arr2
+print(arrMaster)
 '''print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
     if v.pred_vertex is None and v is not vertex_1:
