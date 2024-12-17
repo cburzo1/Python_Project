@@ -1,5 +1,5 @@
-from operator import truediv
 import csv
+from datetime import timedelta
 
 class ChainingHashTable:
     def __init__(self, initial_capacity=16):
@@ -60,6 +60,9 @@ class Vertex:
         self.distance = float('inf')
         self.pred_vertex = None
 
+    def __str__(self):
+        return f'{self.label} {self.distance} pred: {self.pred_vertex}'
+
 class Graph:
     def __init__(self):
         self.adjacency_list = {}  # vertex dictionary {key:value}
@@ -79,10 +82,11 @@ class Graph:
         self.add_directed_edge(vertex_b, vertex_a, weight)
 
 class truck:
-    def __init__(self, num, packageList, location):
+    def __init__(self, num, packageList, location, time):
         self.num = num
         self.packageList = packageList
         self.location = location
+        self.time = time
 
 def loadPackageCSV(filename):
     with open(filename) as PackageCSV:
@@ -95,7 +99,7 @@ def loadPackageCSV(filename):
             pZipCode = package[4]
             pDeadLine = package[5]
             pWeight = package[6]
-            pStatus = "At Hub"
+            pStatus = ["At Hub", "08:00:00"]
 
             package = Package(pID, pAddr, pCity,  pZipCode, pDeadLine, pWeight,  pStatus)
 
@@ -115,7 +119,6 @@ def loadDistanceTableCSV(filename):
 
 def packageLookUp(ID):
     return myHash.search(ID)
-
 
 def dijkstra_shortest_path(g, start_vertex):
     # Put all vertices in an unvisited queue.
@@ -156,11 +159,18 @@ def dijkstra_shortest_path(g, start_vertex):
 def get_shortest_path(start_vertex, end_vertex):
     # Start from end_vertex and build the path backwards.
     path = ""
+    #print(start_vertex.label, end_vertex.label)
+    ctr = 0
+
     current_vertex = end_vertex
+    '''and current_vertex is not None'''
     while current_vertex is not start_vertex:
+        #print('\t',ctr, '\t', current_vertex)
         path = " -> " + str(current_vertex.label) + path
         current_vertex = current_vertex.pred_vertex
+        ctr += 1
     path = start_vertex.label + path
+    #print('\t', path)
     return path
 
 myHash = ChainingHashTable()
@@ -169,24 +179,6 @@ loadPackageCSV("PackageCSV.csv")
 
 loadDistanceTableCSV("DistanceTableCSV.csv")
 
-g = Graph()
-
-vertex_arr = []
-
-#adding all vertices to graph
-for i in range(0, len(city_arr2)):
-    vertex_arr.append(Vertex(city_arr2[i].replace('\n', ' ')))
-    g.add_vertex(vertex_arr[i])
-
-#adding undirected edge between two vertices
-for i in range(0, len(vertex_arr)):
-    for j in range(i + 1, len(vertex_arr)):
-        g.add_undirected_edge(vertex_arr[i], vertex_arr[j], float(weight_arr2[j][i]))
-
-#vertex_1 = vertex_arr[1]
-
-#dijkstra_shortest_path(g, vertex_1)
-
 def getDistanceBetween2Cities(start, end):
     if(start <= end):
         return weight_arr2[end][start]
@@ -194,58 +186,84 @@ def getDistanceBetween2Cities(start, end):
         return 'ERROR::make sure start is less than or equal to end'
 
 def getMinimumDistanceBetween2Cities(start, end):
-    #print("Start", start)
-    #print("End", end)
+    print("Start", start)
+    print("End", end)
+
+    g = Graph()
+    vertex_arr = []
+
+    # adding all vertices to graph
+    for i in range(0, len(city_arr2)):
+        vertex_arr.append(Vertex(city_arr2[i].replace('\n', ' ')))
+        g.add_vertex(vertex_arr[i])
+
+    # adding undirected edge between two vertices
+    for i in range(0, len(vertex_arr)):
+        for j in range(i + 1, len(vertex_arr)):
+            g.add_undirected_edge(vertex_arr[i], vertex_arr[j], float(weight_arr2[j][i]))
+
     vertex_1 = vertex_arr[start]
     dijkstra_shortest_path(g, vertex_1)
     get_shortest_path(vertex_arr[start], vertex_arr[end])
 
     if(start <= end):
+        #print(vertex_arr[end].distance)
         return vertex_arr[end].distance
     else:
         return 'ERROR::make sure start is less than or equal to end'
 
-'''trk = truck(1, [1,2, 3, 4, 5], "At Hub")
 
-arr = [1, 2, 3, 4]
+def getTimeBetweenPXandPY(time_string, distanceFromPXtoPy):
+    # print(time_string)
+    h, m, s = time_string.split(':')
+    current_time = timedelta(hours=int(h), minutes=int(m))
+    # print(current_time)
+    travel_time = timedelta(hours=distanceFromPXtoPy / 18)
+    # print(travel_time, (current_time + travel_time))
+    return current_time + travel_time
 
-pkS1 = 0
-pkE1 = city_arr2.index(" "+packageLookUp(arr[0]).addr+"\n("+packageLookUp(arr[0]).zipcode+")")
+trk = truck(1, [1,2,4, 5, 7, 8,10, 11, 12], "At Hub", "08:00:00")
+total = 0
+currentTime = trk.time
+pkS = 0
+pkE = 0
 
-pkS2 = city_arr2.index(" "+packageLookUp(arr[0]).addr+"\n("+packageLookUp(arr[0]).zipcode+")")
-pkE2 = city_arr2.index(" "+packageLookUp(arr[1]).addr+"\n("+packageLookUp(arr[1]).zipcode+")")
-
-pkS3 = city_arr2.index(" "+packageLookUp(arr[1]).addr+"\n("+packageLookUp(arr[1]).zipcode+")")
-pkE3 = city_arr2.index(" "+packageLookUp(arr[2]).addr+"\n("+packageLookUp(arr[2]).zipcode+")")'''
-
-'''for i in range(0, len(trk.packageList)):
+for i in range(0, len(trk.packageList)):
     if trk.location == "At Hub":
-        pkS = 0
+        pkS = city_arr2.index(" HUB")
         pkE = city_arr2.index(" "+packageLookUp(trk.packageList[i]).addr+"\n("+packageLookUp(trk.packageList[i]).zipcode+")")
         trk.location = "Delivered"
     else:
         pkS = city_arr2.index(" " + packageLookUp(trk.packageList[i - 1]).addr + "\n(" + packageLookUp(trk.packageList[i - 1]).zipcode + ")")
         pkE = city_arr2.index(" " + packageLookUp(trk.packageList[i]).addr + "\n(" + packageLookUp(trk.packageList[i]).zipcode + ")")
+        trk.location = "Delivered"
 
     if pkS < pkE:
-        print(getMinimumDistanceBetween2Cities(pkS, pkE))
+        temp_var = getMinimumDistanceBetween2Cities(pkS, pkE)
+        print(round(temp_var, 1))
+        currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+        print(currentTime, trk.location)
+        total += temp_var
+        #print("Not Switched")
+
     else:
-        print(getMinimumDistanceBetween2Cities(pkE, pkS))'''
+        temp_var = getMinimumDistanceBetween2Cities(pkE, pkS)
+        print(round(temp_var, 1))
+        currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+        print(currentTime, trk.location)
+        total += temp_var
+        #print("Switched")
 
-#print(getDistanceBetween2Cities(0, 14))
-#print(getMinimumDistanceBetween2Cities(pkS1, pkE1))
-#print(getMinimumDistanceBetween2Cities(pkS2, pkE2))
+    if i == len(trk.packageList) - 1:
+        temp_var = getMinimumDistanceBetween2Cities(city_arr2.index(" HUB"), pkS)
+        print(temp_var)
+        currentTime = getTimeBetweenPXandPY(str(currentTime), temp_var)
+        trk.location = "At Hub"
+        print(currentTime, trk.location)
+        total += temp_var
 
-#print(getMinimumDistanceBetween2Cities(pkS1, pkE1))
-#print(getMinimumDistanceBetween2Cities(pkS2, pkE2))
-#print(getMinimumDistanceBetween2Cities(pkE3, pkS3))
-
-#print(" "+packageLookUp(1).addr+"\n("+packageLookUp(1).zipcode+")")
-
-#print(city_arr2.index(" "+packageLookUp(2).addr+"\n("+packageLookUp(2).zipcode+")"))
-#print(getMinimumDistanceBetween2Cities(5, 9))
-
-#print("1 to %s ==> %s (total distance: %g)" % (vertex_arr[1].label, get_shortest_path(vertex_1, vertex_arr[1]), vertex_arr[1].distance))
+print("--------------------------------------------------------------------------------")
+print("Total Distance of Truck1 and total time of travel:", round(total, 1), currentTime)
 
 '''print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
@@ -256,3 +274,5 @@ for v in g.adjacency_list:
 
 #for i in range(len(myHash.table)+1):
     #print("Key: {} and Package: {}".format(i + 1, myHash.search(i + 1)))
+
+#print(packageLookUp(1).status[1])
