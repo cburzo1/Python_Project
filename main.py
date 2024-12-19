@@ -180,6 +180,12 @@ myHash = ChainingHashTable()
 
 loadPackageCSV("PackageCSV.csv")
 
+myHash.search(25).addr = "5383 S 900 East #104"
+myHash.search(26).addr = "5383 S 900 East #104"
+
+#print(myHash.search(25).addr)
+#print(myHash.search(26).addr)
+
 loadDistanceTableCSV("DistanceTableCSV.csv")
 
 def getDistanceBetween2Cities(start, end):
@@ -223,7 +229,17 @@ def getTimeBetweenPXandPY(time_string, distanceFromPXtoPy):
     # print(current_time)
     travel_time = timedelta(hours=distanceFromPXtoPy / 18)
     # print(travel_time, (current_time + travel_time))
-    return current_time + travel_time
+
+    calc_time = current_time + travel_time
+
+    formatted_timedelta_current_time = f"{calc_time.seconds // 3600:02}:{(calc_time.seconds // 60) % 60:02}:{calc_time.seconds % 60:02}"
+    #formatted_timedelta_travel_time = f"{current_time.seconds // 3600:02}:{(current_time.seconds // 60) % 60:02}:{current_time.seconds % 60:02}"
+
+    #print(formatted_timedelta_current_time)
+
+    #print(formatted_timedelta_current_time + travel_time)
+
+    return formatted_timedelta_current_time
 
 def getTruckRoute(trk):
     total = 0
@@ -296,33 +312,51 @@ def getTruckRoute(trk):
 
     return trk
 
-trk1 = getTruckRoute(truck(1, [1, 2, 4], "At Hub", "At Hub", "08:00:00", "08:00:00", 0))
-trk2 = getTruckRoute(truck(2, [3, 5], "At Hub", "At Hub", "08:00:00", "08:00:00", 0))
-trk1_2 = getTruckRoute(truck(1, [6], "At Hub", "At Hub", trk1.time, trk1.time, trk1.mileage))
+trk1 = getTruckRoute(truck(1, [15,40,37, 13,14, 16,19,20, 31, 34], "At Hub", "At Hub", "08:00:00", "08:00:00", 0))
+trk2 = getTruckRoute(truck(2, [1, 6, 25, 29, 30, 3, 9, 18, 36, 38], "At Hub", "At Hub", "09:05:00", "09:05:00", 0))
+trk1_2 = getTruckRoute(truck(1, [], "At Hub", "At Hub", trk1.time, trk1.time, trk1.mileage))
 
-print("TRUCK 1 first route", trk1.mileage, trk1.time)
-print("TRUCK 2", trk2.mileage, trk2.time)
-print("TRUCK 1 second route", trk1_2.mileage, trk1_2.time)
+"1, 6, 25, 29, 30, 3, 18, 36, 9, 38, 11, 17, 21, 12"
 
-print(packageLookUp(trk1_2.packageList[0]).status[0])
-print(trk1_2.location)
+#print(trk1.mileage)
+#print(trk2.mileage)
+#print(trk1_2.mileage)
 
-#if packageLookUp(trk1_2.packageList[0]).status[0] != trk1_2.location and trk1_2.location == "At Hub":
-    #packageLookUp(trk1_2.packageList[0]).status[0] = "At Hub"
+#print(trk1.mileage + trk2.mileage + trk1_2.mileage)
 
-print(packageLookUp(trk1_2.packageList[0]).status[0] == trk1_2.location)
+myInputTime = "10:30:00"
 
-myInputTime = "8:33:00"
-
-print("All Package Statuses at", myInputTime)
+#print("All Package Statuses at", myInputTime)
 for i in range(1, 41):
-    if myInputTime <= "08:00:00" or myInputTime <= "8:00:00":
-        print("All trucks are At Hub Being Loaded")
-        break
-    if myInputTime < packageLookUp(i).status[1]:
-            packageLookUp(i).status[0] = "En Route"
+    if packageLookUp(i).ID in trk1.packageList:
+        truck = "trk1"
+    elif packageLookUp(i).ID in trk2.packageList:
+        truck = "trk2"
+    elif packageLookUp(i).ID in trk1_2.packageList:
+        truck = "trk1_2"
+    else:
+        truck = "no truck has loaded the package yet"
 
-    print("Package ID:", packageLookUp(i).ID,", ", packageLookUp(i).addr, ", ",packageLookUp(i).city, ", ",packageLookUp(i).zipcode, ", ",packageLookUp(i).deadline, ", ",packageLookUp(i).weight , " --- ", packageLookUp(i).status[0], " at ", packageLookUp(i).status[1] if packageLookUp(i).status[0] == "Delivered" else myInputTime)
+    #print(truck)
+
+    if myInputTime < packageLookUp(i).status[1]:
+        packageLookUp(i).status[0] = "En Route"
+
+    if myInputTime < trk2.startingTime and truck == "trk2":
+        packageLookUp(i).status[0] = "At Hub"
+
+    if myInputTime < trk1.time and truck == "trk1_2":
+        packageLookUp(i).status[0] = "At Hub"
+
+    if myInputTime >= "10:20:00":
+        packageLookUp(9).addr = "410 S State St"
+        packageLookUp(9).zipcode = "84111"
+
+    #print("Package ID:", packageLookUp(i).ID,", ", packageLookUp(i).addr, ", ",packageLookUp(i).city, ", ",packageLookUp(i).zipcode, ", ",packageLookUp(i).deadline, ", ",packageLookUp(i).weight , " --- ", packageLookUp(i).status[0], " at ", packageLookUp(i).status[1] if packageLookUp(i).status[0] == "Delivered" else myInputTime)
+
+#Write a program that will display the optimal destination for each element for each truck
+
+def getaShorterDistance(arrTest)
 
 '''print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
