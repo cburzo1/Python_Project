@@ -312,17 +312,17 @@ def getTruckRoute(trk):
 
     return trk
 
-trk1 = getTruckRoute(truck(1, [15,40,37, 13,14, 16,19,20, 31, 34], "At Hub", "At Hub", "08:00:00", "08:00:00", 0))
-trk2 = getTruckRoute(truck(2, [1, 6, 25, 29, 30, 3, 9, 18, 36, 38], "At Hub", "At Hub", "09:05:00", "09:05:00", 0))
-trk1_2 = getTruckRoute(truck(1, [], "At Hub", "At Hub", trk1.time, trk1.time, trk1.mileage))
+trk1 = getTruckRoute(truck(1, [16, 34, 15, 37, 14, 20, 40, 19, 31, 13], "At Hub", "At Hub", "08:00:00", "08:00:00", 0))
+trk2 = getTruckRoute(truck(2, [38, 3, 30, 1, 25,6, 36, 9, 18, 29], "At Hub", "At Hub", "09:05:00", "09:05:00", 0))
+trk1_2 = getTruckRoute(truck(1, [], "At Hub", "At Hub", trk1.time, trk1.time, 0))
 
 "1, 6, 25, 29, 30, 3, 18, 36, 9, 38, 11, 17, 21, 12"
 
-#print(trk1.mileage)
-#print(trk2.mileage)
-#print(trk1_2.mileage)
+print(trk1.mileage)
+print(trk2.mileage)
+print(trk1_2.mileage)
 
-#print(trk1.mileage + trk2.mileage + trk1_2.mileage)
+print(trk1.mileage + trk2.mileage + trk1_2.mileage)
 
 myInputTime = "10:30:00"
 
@@ -352,11 +352,33 @@ for i in range(1, 41):
         packageLookUp(9).addr = "410 S State St"
         packageLookUp(9).zipcode = "84111"
 
-    #print("Package ID:", packageLookUp(i).ID,", ", packageLookUp(i).addr, ", ",packageLookUp(i).city, ", ",packageLookUp(i).zipcode, ", ",packageLookUp(i).deadline, ", ",packageLookUp(i).weight , " --- ", packageLookUp(i).status[0], " at ", packageLookUp(i).status[1] if packageLookUp(i).status[0] == "Delivered" else myInputTime)
+    print("Package ID:", packageLookUp(i).ID,", ", packageLookUp(i).addr, ", ",packageLookUp(i).city, ", ",packageLookUp(i).zipcode, ", ",packageLookUp(i).deadline, ", ",packageLookUp(i).weight , " --- ", packageLookUp(i).status[0], " at ", packageLookUp(i).status[1] if packageLookUp(i).status[0] == "Delivered" else myInputTime)
 
 #Write a program that will display the optimal destination for each element for each truck
 
-def getaShorterDistance(arrTest)
+def getaShorterDistance(arrTest):
+    total = 0
+    for i in range(0, len(arrTest)):
+        print("i: ", arrTest[i], " -> ")
+        max = 140.0
+        for j in range(0, len(arrTest)):
+            if i < j:
+                if getMinimumDistanceBetween2Cities(i, j) < max:
+                    max = getMinimumDistanceBetween2Cities(i, j)
+                print("j: ",arrTest[j], "min: " ,getMinimumDistanceBetween2Cities(i, j))
+            elif i > j:
+                if getMinimumDistanceBetween2Cities(j, i) < max:
+                    max = getMinimumDistanceBetween2Cities(j, i)
+                print("j: ", arrTest[j], "min: ", getMinimumDistanceBetween2Cities(j, i))
+
+        print("min", max)
+        total += max
+
+    print(total)
+
+#getaShorterDistance([1, 6, 25, 29, 30, 3, 9, 18, 36, 38])
+
+#print(getMinimumDistanceBetween2Cities(0, 13))
 
 '''print("\nDijkstra shortest path:")
 for v in g.adjacency_list:
